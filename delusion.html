@@ -1,0 +1,332 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Imagination Confessions — Prototype</title>
+  <style>
+    :root{--bg:#0f1724;--card:#0b1220;--muted:#98a0b3;--accent:#7c3aed}
+    *{box-sizing:border-box}
+    body{margin:0;font-family:Inter,Segoe UI,Roboto,system-ui,Arial;background:linear-gradient(180deg,#071028 0%,var(--bg)100%);color:#e6eef8;min-height:100vh;display:flex;align-items:center;justify-content:center;padding:24px}
+    .wrap{width:100%;max-width:980px}
+    header{display:flex;align-items:center;gap:16px;margin-bottom:18px}
+    .logo{width:60px;height:60px;background:linear-gradient(135deg,var(--accent),#06b6d4);border-radius:12px;display:grid;place-items:center;font-weight:700;font-size:20px;color:#051124}
+    h1{margin:0;font-size:20px}
+    p.lead{margin:0;color:var(--muted);font-size:13px}
+
+    .grid{display:grid;grid-template-columns:1fr 380px;gap:18px}
+    @media (max-width:880px){.grid{grid-template-columns:1fr}}
+
+    .card{background:rgba(255,255,255,0.03);padding:16px;border-radius:12px;box-shadow:0 6px 20px rgba(2,6,23,0.6)}
+    label{display:block;font-size:12px;color:var(--muted);margin-bottom:6px}
+    input[type=text],textarea,select{width:100%;padding:10px;border-radius:8px;border:1px solid rgba(255,255,255,0.04);background:transparent;color:inherit;font-size:14px}
+    textarea{min-height:110px;resize:vertical}
+    .row{display:flex;gap:8px}
+    .btn{display:inline-block;padding:10px 12px;border-radius:10px;border:0;background:var(--accent);color:white;font-weight:600;cursor:pointer}
+    .btn.ghost{background:transparent;border:1px solid rgba(255,255,255,0.06)}
+    .small{font-size:13px;padding:8px 10px}
+
+    .feed{display:flex;flex-direction:column;gap:12px}
+    .post{background:linear-gradient(180deg,rgba(255,255,255,0.02),rgba(255,255,255,0.01));padding:12px;border-radius:10px}
+    .meta{display:flex;justify-content:space-between;align-items:center;gap:8px;margin-bottom:8px}
+    .badge{font-size:12px;padding:6px 8px;border-radius:999px;background:rgba(255,255,255,0.03);color:var(--muted)}
+    .content{white-space:pre-wrap;font-size:15px;color:#dfe9fb}
+    .muted{color:var(--muted);font-size:13px}
+
+    .right-col .panel{margin-bottom:12px}
+    .prompt-box{background:rgba(255,255,255,0.02);padding:10px;border-radius:10px}
+    .center{display:grid;place-items:center}
+    footer{margin-top:12px;color:var(--muted);font-size:13px;text-align:center}
+
+    
+    .toast { position: fixed; left: 50%; transform: translateX(-50%); bottom: 28px; background: rgba(0,0,0,0.6); color: #fff; padding:10px 14px; border-radius:10px; font-size:13px; z-index:9999; }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <header>
+      <div class="logo">IM</div>
+      <div>
+        <h1>Imagination Confessions</h1>
+        <p class="lead">Write anonymous confessions, apologies, or wild imaginations — share safely and creatively.</p>
+      </div>
+    </header>
+
+    <div class="grid">
+      <div>
+        <section class="card">
+          <label for="type">Type</label>
+          <select id="type">
+            <option>Confession</option>
+            <option>Apology</option>
+            <option>Imagination</option>
+            <option>Shower Thought</option>
+          </select>
+
+          <div style="height:10px"></div>
+          <label for="name">Display name (optional)</label>
+          <input id="name" placeholder="e.g., A shy stranger, A friend, Anonymous" />
+
+          <div style="height:10px"></div>
+          <label for="text">Your message</label>
+          <textarea id="text" placeholder="Write something honest, wild, or funny..."></textarea>
+
+          <div style="height:8px"></div>
+          <div class="row">
+            <button id="postBtn" class="btn">Post anonymously</button>
+            <button id="previewBtn" class="btn ghost small">Preview</button>
+            <button id="promptBtn" class="btn ghost small">Random prompt</button>
+            <button id="clearBtn" class="btn ghost small">Clear</button>
+          </div>
+
+          <div id="preview" style="margin-top:12px;display:none" class="card">
+            <div class="muted">Preview</div>
+            <div id="previewContent" style="margin-top:8px"></div>
+          </div>
+
+        </section>
+
+        <section style="margin-top:12px" class="card">
+          <div style="display:flex;justify-content:space-between;align-items:center">
+            <div class="muted">Feed</div>
+            <div><button id="clearAll" class="btn ghost small">Clear all (local)</button></div>
+          </div>
+
+          <div id="feed" class="feed" style="margin-top:12px;max-height:56vh;overflow:auto;padding-right:6px"></div>
+        </section>
+      </div>
+
+      <aside class="right-col">
+        <div class="panel card">
+          <div class="muted">Tips for a good post</div>
+          <ul style="margin-top:8px;color:var(--muted);padding-left:18px">
+            <li>Be honest but kind — keep real names out.</li>
+            <li>Short & vivid messages get more reads.</li>
+            <li>Use imagination mode for playful entries.</li>
+          </ul>
+        </div>
+
+        <div class="panel card center">
+          <div class="muted">Random prompt</div>
+          <div id="prompt" class="prompt-box" style="margin-top:8px">Try a random prompt — click “Random prompt”.</div>
+          <div style="height:8px"></div>
+          <button id="usePrompt" class="btn small">Use prompt in box</button>
+        </div>
+
+        <div class="panel card">
+          <div class="muted">About anonymity</div>
+          <div style="margin-top:8px;color:var(--muted);font-size:13px">This prototype stores posts locally in your browser only. Deploy with a proper backend or moderation if you want public access.</div>
+        </div>
+
+      </aside>
+    </div>
+
+    <footer>Prototype • Local-only storage • Built for fun</footer>
+  </div>
+
+<script>
+(function(){
+  
+  const postBtn = document.getElementById('postBtn');
+  const previewBtn = document.getElementById('previewBtn');
+  const promptBtn = document.getElementById('promptBtn');
+  const clearBtn = document.getElementById('clearBtn');
+  const clearAll = document.getElementById('clearAll');
+  const previewEl = document.getElementById('preview');
+  const previewContent = document.getElementById('previewContent');
+  const feed = document.getElementById('feed');
+  const promptBox = document.getElementById('prompt');
+  const usePrompt = document.getElementById('usePrompt');
+
+  
+  const prompts = [
+    "I once apologised for something I didn't remember — but it felt right.",
+    "If I could whisper one secret across the cafeteria, I'd say...",
+    "I imagine a world where we send postcards to our future selves.",
+    "Sorry for the small lie I told so you'd smile.",
+    "Confession: I rewatch old messages and imagine different replies.",
+    "I dreamt we met on a train and never said goodbye.",
+    "I've been practicing a compliment to say to someone I like.",
+    "If apologies were flowers, I'd send a whole garden to you.",
+  ];
+
+  function loadPosts(){
+    const raw = localStorage.getItem('im_posts') || '[]';
+    try{ return JSON.parse(raw) }catch(e){ return []; }
+  }
+  function savePosts(posts){ localStorage.setItem('im_posts', JSON.stringify(posts)); }
+
+  
+  function escapeHtml(s){
+    if(!s) return '';
+    return String(s)
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;')
+      .replace(/'/g, '&#39;');
+  }
+
+ 
+  function timeAgo(ts){
+    const seconds = Math.floor((Date.now() - ts) / 1000);
+    if(seconds < 60) return seconds + 's ago';
+    const minutes = Math.floor(seconds / 60);
+    if(minutes < 60) return minutes + 'm ago';
+    const hours = Math.floor(minutes / 60);
+    if(hours < 24) return hours + 'h ago';
+    const days = Math.floor(hours / 24);
+    if(days < 7) return days + 'd ago';
+    const d = new Date(ts);
+    return d.toLocaleString();
+  }
+
+  
+  function showToast(msg, ms = 1500){
+    const t = document.createElement('div');
+    t.className = 'toast';
+    t.textContent = msg;
+    document.body.appendChild(t);
+    setTimeout(()=> t.remove(), ms);
+  }
+
+  function render(){
+    const posts = loadPosts();
+    feed.innerHTML = '';
+    if(!posts.length){
+      feed.innerHTML = '<div class="muted">No posts yet. Be the first!</div>';
+      return;
+    }
+
+   
+    posts.slice().reverse().forEach((p, i) => {
+      const realIdx = posts.length - 1 - i; 
+      const el = document.createElement('div');
+      el.className = 'post';
+      el.dataset.index = realIdx;
+
+      el.innerHTML = `
+        <div class="meta">
+          <div><strong>${escapeHtml(p.name || 'Anonymous')}</strong> <span class="muted">• ${escapeHtml(p.type)}</span></div>
+          <div class="muted" title="${new Date(p.t).toLocaleString()}">${timeAgo(p.t)}</div>
+        </div>
+        <div class="content">${escapeHtml(p.text)}</div>
+        <div style="margin-top:8px;display:flex;gap:8px;align-items:center">
+          <button class='btn small' data-like>${p.likes || 0} ❤</button>
+          <button class='btn ghost small' data-copy>Copy</button>
+        </div>
+      `;
+
+      feed.appendChild(el);
+    });
+  }
+
+  
+  postBtn.addEventListener('click', () => {
+    const type = document.getElementById('type').value;
+    const name = document.getElementById('name').value.trim();
+    const text = document.getElementById('text').value.trim();
+    if(!text){
+      showToast('Write something first.');
+      return;
+    }
+    const posts = loadPosts();
+    posts.push({ type, name, text, t: Date.now(), likes: 0 });
+    savePosts(posts);
+    render();
+    document.getElementById('text').value = '';
+   
+    feed.scrollTop = 0;
+  });
+
+ 
+  previewBtn.addEventListener('click', () => {
+    const type = document.getElementById('type').value;
+    const name = document.getElementById('name').value.trim() || 'Anonymous';
+    const text = document.getElementById('text').value.trim() || '(empty)';
+    previewContent.innerHTML = `
+      <div class='muted'>${escapeHtml(name)} • ${escapeHtml(type)}</div>
+      <div style='margin-top:6px' class='content'>${escapeHtml(text)}</div>
+    `;
+    previewEl.style.display = 'block';
+    setTimeout(()=> previewEl.scrollIntoView({behavior:'smooth'}), 150);
+  });
+
+  
+  promptBtn.addEventListener('click', () => {
+    const p = prompts[Math.floor(Math.random() * prompts.length)];
+    promptBox.textContent = p;
+  });
+
+ 
+  usePrompt.addEventListener('click', () => {
+    document.getElementById('text').value = promptBox.textContent || '';
+    
+    document.getElementById('text').focus();
+  });
+
+  
+  clearBtn.addEventListener('click', () => {
+    if(confirm('Clear the compose box?')){
+      document.getElementById('text').value = '';
+      document.getElementById('name').value = '';
+    }
+  });
+
+  
+  clearAll.addEventListener('click', () => {
+    if(confirm('Remove all posts from local storage?')){
+      localStorage.removeItem('im_posts');
+      render();
+    }
+  });
+
+  
+  feed.addEventListener('click', (e) => {
+    const likeBtn = e.target.closest('[data-like]');
+    const copyBtn = e.target.closest('[data-copy]');
+    if(likeBtn){
+      const postEl = likeBtn.closest('.post');
+      const idx = parseInt(postEl.dataset.index, 10);
+      const posts = loadPosts();
+      if(!isNaN(idx) && posts[idx]){
+        posts[idx].likes = (posts[idx].likes || 0) + 1;
+        savePosts(posts);
+        render();
+      }
+    }
+    if(copyBtn){
+      const postEl = copyBtn.closest('.post');
+      const content = postEl.querySelector('.content')?.innerText || '';
+      if(navigator.clipboard && navigator.clipboard.writeText){
+        navigator.clipboard.writeText(content).then(() => showToast('Copied!'), () => showToast('Unable to copy'));
+      } else {
+        
+        const ta = document.createElement('textarea');
+        ta.value = content;
+        document.body.appendChild(ta);
+        ta.select();
+        try {
+          document.execCommand('copy');
+          showToast('Copied!');
+        } catch (err){
+          showToast('Unable to copy');
+        } finally {
+          ta.remove();
+        }
+      }
+    }
+  });
+
+
+  if(!loadPosts().length){
+    savePosts([{type:'Imagination', name:'Prototype', text:'If I could send one postcard to the past, I would write: Be kinder to yourself.', t:Date.now() - 1000 * 60 * 60 * 6, likes:2 }]);
+  }
+
+  
+  render();
+
+})();
+</script>
+</body>
+</html>
