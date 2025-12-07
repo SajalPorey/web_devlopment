@@ -2,7 +2,7 @@
 Websites made by me 
 # Imagination Confessions — Prototype
 
-![Project Screenshot](screenshot.png)
+
 
 A fun, local-only web application that allows users to write anonymous confessions, apologies, or imaginative thoughts. This prototype is designed for creative self-expression while maintaining anonymity, storing posts only in the browser's local storage.  
 
@@ -43,7 +43,7 @@ A fun, local-only web application that allows users to write anonymous confessio
 
 ## ⚡ Live Demo
 
-[View the live project on Vercel](https://web-devlopment-hphq8b3ah-sajalporeys-projects.vercel.app)
+[View the live project on Vercel] web-devlopment-igjudq1u7-sajalporeys-projects.vercel.app
 
 ---
 
